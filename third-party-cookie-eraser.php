@@ -3,7 +3,7 @@
  * Plugin Name: Third Party Cookie Eraser
  * Plugin URI: http://andreapernici.com/wordpress/third-party-cookie-eraser/
  * Description: The Cookie Law is one of the most stupid law in the world. Maybe made by someone, who doesn't really understand how the web works. This plugin is a drastic solution to lock all the third party contents inside posts and pages not possible using the editor or for website with lot's of authors. You can use the plugin in conjunction with any kind of plugin you prefer for the Cookie Consent. You only need to setup your cookie values.
- * Version: 1.0.2
+ * Version: 1.1.0
  * Author: Andrea Pernici
  * Author URI: http://www.andreapernici.com/
  * Text Domain: third-party-cookie-eraser
