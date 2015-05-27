@@ -1,10 +1,10 @@
 # Third Party Cookie Eraser 
-Contributors: Andrea Pernici
+Contributors: Andrea Pernici, overclokk
 Donate link: http://www.andreapernici.com/donazioni/
 Tags: cookie law, cookie, third party script, third party cookie
 Requires at least: 2.6
 Tested up to: 4.2.2
-stable tag: 1.0.2
+stable tag: 1.1.0
 
 Remove all the occurence of third party embed inside posts, pages and widgets until consent. Plugin requirement PHP >= 5.3
 
@@ -20,6 +20,9 @@ More info:
 * Check out the other [Wordpress plugins](http://www.andreapernici.com/wordpress/) by the same author, and follow him on the: [SEO Blog](http://seoblog.giorgiotave.it/).
 
 **Changelog**
+
+= 1.1.0 =
+* Rewrote the plugin by following WordPress code standard
 
 = 1.0.2 =
 * Fixed strict mode bug
