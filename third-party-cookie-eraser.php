@@ -131,7 +131,7 @@ if ( !class_exists( 'AndreaThirdPartyCookieEraser' ) ){
                  * Replacement for regex
                  * @var string
                  */
-                $this->valore = '<div class="el"><div style="padding:10px;margin-bottom: 18px;color: #b94a48;background-color: #f2dede;border: 1px solid #eed3d7; text-shadow: 0 1px 0 rgba(255, 255, 255, 0.5);-webkit-border-radius: 4px;-moz-border-radius: 4px;border-radius: 4px;">' . esc_textarea( $this->options['text'] ) . '</div><!-- $0 --></div>';
+                $this->valore = '<div class="el"><div style="padding:10px;margin-bottom: 18px;color: #b94a48;background-color: #f2dede;border: 1px solid #eed3d7; text-shadow: 0 1px 0 rgba(255, 255, 255, 0.5);-webkit-border-radius: 4px;-moz-border-radius: 4px;border-radius: 4px;">' . esc_textarea( $this->options['text'] ) . '<button onclick="myFunction()">Try it</button></div><!-- $0 --></div>';
 
             	add_filter( 'the_content', array( $this, 'AutoErase' ), 11);
 
