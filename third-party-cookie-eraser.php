@@ -422,6 +422,15 @@ if ( !class_exists( 'AndreaThirdPartyCookieEraser' ) ){
 
 			$valore = '<div style="padding:10px;margin-bottom: 18px;color: #b94a48;background-color: #f2dede;border: 1px solid #eed3d7; text-shadow: 0 1px 0 rgba(255, 255, 255, 0.5);-webkit-border-radius: 4px;-moz-border-radius: 4px;border-radius: 4px;">' . esc_textarea( $this->options['text'] ) . '</div>';
 
+			preg_match_all('#<iframe.*?\/iframe>|<embed.*?>|<script.*?\/script>#is', $content, $matches);
+                        $i=0; foreach ($matches[0] as $value) { $commento .= '<!--'.$value.'-->'; }
+                        $nuovo_contenuto = preg_replace('#<iframe.*?\/iframe>|<embed.*?>|<script.*?\/script>#is', $valore , $content);
+                        $nuovo_contenuto = $nuovo_contenuto.$commento;
+
+/*                      return preg_replace('#<iframe.*?\/iframe>|<embed.*?>|<script.*?\/script>#is', $valore , $content);
+*/                      return $nuovo_contenuto;
+
+
 			$content = preg_replace( $this->replace, $valore , $content);
 
 			
