@@ -94,7 +94,9 @@ if ( !class_exists( 'AndreaThirdPartyCookieEraser' ) ){
 
         private $options_lang = '';
 
-        private $replace = '#<iframe.*?\/iframe>|<embed.*?>|<script.*?\/script>#is';
+        private $pattern = '#<iframe.*?\/iframe>|<embed.*?>|<script.*?\/script>#is';
+
+        private $valore = '';
 
 
         /**
@@ -121,8 +123,15 @@ if ( !class_exists( 'AndreaThirdPartyCookieEraser' ) ){
             // if ( !isset( $_COOKIE[ $this->options_cookie_name ] ) && $_COOKIE[ $this->options_cookie_name ] !== $this->options_cookie_value ){
             // 
             $this->options = get_option( 'third-party-cookie-eraser' );
-            // var_dump($this->options);
+
             if ( !isset( $_COOKIE[ $this->options['cookie_name'] ] ) ){
+
+
+                /**
+                 * Replacement for regex
+                 * @var string
+                 */
+                $this->valore = '<div class="el"><div style="padding:10px;margin-bottom: 18px;color: #b94a48;background-color: #f2dede;border: 1px solid #eed3d7; text-shadow: 0 1px 0 rgba(255, 255, 255, 0.5);-webkit-border-radius: 4px;-moz-border-radius: 4px;border-radius: 4px;">' . esc_textarea( $this->options['text'] ) . '</div><!-- $0 --></div>';
 
             	add_filter( 'the_content', array( $this, 'AutoErase' ), 11);
 
@@ -137,15 +146,17 @@ if ( !class_exists( 'AndreaThirdPartyCookieEraser' ) ){
 
             			if(!is_string($v) or empty($v)) return $v;
 
-            			$valore = '<div style="padding:10px;margin-bottom: 18px;color: #b94a48;background-color: #f2dede;border: 1px solid #eed3d7; text-shadow: 0 1px 0 rgba(255, 255, 255, 0.5);-webkit-border-radius: 4px;-moz-border-radius: 4px;border-radius: 4px;">' . esc_textarea( $this->options['text'] ) . '</div>';
+            			// $valore = '<div class="el" id="prova"><div class="alert" style="padding:10px;margin-bottom: 18px;color: #b94a48;background-color: #f2dede;border: 1px solid #eed3d7; text-shadow: 0 1px 0 rgba(255, 255, 255, 0.5);-webkit-border-radius: 4px;-moz-border-radius: 4px;border-radius: 4px;">' . esc_textarea( $this->options['text'] ) . '</div><!-- $0 --></div>';
 
-            			return preg_replace( $this->replace, $valore , $v);
+            			return preg_replace( $this->pattern, $this->valore , $v);
 
             		};
 
             		return $fnFixArray($instance);
 
-            	}, 11, 3); 
+            	}, 11, 3);
+
+                add_action( 'wp_footer', array( $this, 'printJS' ), 999 );
 
             }
         }
@@ -420,18 +431,31 @@ if ( !class_exists( 'AndreaThirdPartyCookieEraser' ) ){
          */
 		public function AutoErase( $content ) {
 
-			$valore = '<div style="padding:10px;margin-bottom: 18px;color: #b94a48;background-color: #f2dede;border: 1px solid #eed3d7; text-shadow: 0 1px 0 rgba(255, 255, 255, 0.5);-webkit-border-radius: 4px;-moz-border-radius: 4px;border-radius: 4px;">' . esc_textarea( $this->options['text'] ) . '</div>';
+			// $valore = '<div class="el" id="prova"><div class="alert" style="padding:10px;margin-bottom: 18px;color: #b94a48;background-color: #f2dede;border: 1px solid #eed3d7; text-shadow: 0 1px 0 rgba(255, 255, 255, 0.5);-webkit-border-radius: 4px;-moz-border-radius: 4px;border-radius: 4px;">' . esc_textarea( $this->options['text'] ) . '</div><!-- $0 --></div>';
 
-			preg_match_all('#<iframe.*?\/iframe>|<embed.*?>|<script.*?\/script>#is', $content, $matches);
-                        $i=0; foreach ($matches[0] as $value) { $commento .= '<!--'.$value.'-->'; }
-                        $nuovo_contenuto = preg_replace('#<iframe.*?\/iframe>|<embed.*?>|<script.*?\/script>#is', $valore , $content);
-                        $nuovo_contenuto = $nuovo_contenuto.$commento;
+            // preg_match_all( $this->pattern, $content, $matches );
+
+            // var_dump($matches[0]);
+
+            // $i = 0;
+            // foreach ( $matches[0] as $value ){
+
+            //     $commento .= '<!--' . $value . '-->';
+
+            // }
+
+            // $nuovo_contenuto = preg_replace( $this->pattern, $this->valore , $content, -1 , $count);
+
+            // var_dump($count);
+
+            // $nuovo_contenuto = $nuovo_contenuto . $commento;
 
 /*                      return preg_replace('#<iframe.*?\/iframe>|<embed.*?>|<script.*?\/script>#is', $valore , $content);
-*/                      return $nuovo_contenuto;
+*/
+            // return $nuovo_contenuto;
 
 
-			$content = preg_replace( $this->replace, $valore , $content);
+			$content = preg_replace( $this->pattern, $this->valore , $content);
 
 			
 			return $content;
@@ -441,6 +465,29 @@ if ( !class_exists( 'AndreaThirdPartyCookieEraser' ) ){
 
 
 		}
+
+        public function printJS(){
+
+            $js = '<script>
+                function myFunction() {
+                    var x=document.getElementsByClassName("el");
+
+                    var i;
+                    for (i = 0; i < x.length; i++) {
+
+                        x[i].removeChild(x[i].childNodes[0]);
+
+                        var str = x[i].innerHTML;
+                        var res = str.replace(/<!--(.*?)-->/g, "$1");
+                        x[i].innerHTML = res;
+
+                    }
+                }
+            </script>';
+
+            echo $js;
+
+        }
 
     }// class
 }//endif
