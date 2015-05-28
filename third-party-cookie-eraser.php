@@ -481,7 +481,7 @@ if ( !class_exists( 'AndreaThirdPartyCookieEraser' ) ){
                         var res = str.replace(/<!--(.*?)-->/g, "$1");
                         x[i].innerHTML = res;
 
-                        cookieName="displayCookieConsent";var expiryDate=new Date();expiryDate.setFullYear(expiryDate.getFullYear()+1);document.cookie=cookieName+"=y; expires="+expiryDate.toGMTString()+"; path=/";
+                        cookieName="' . esc_attr( $this->options['cookie_name'] ) . '";var expiryDate=new Date();expiryDate.setFullYear(expiryDate.getFullYear()+1);document.cookie=cookieName+"=' . esc_attr( $this->options['cookie_value'] ) . '; expires="+expiryDate.toGMTString()+"; path=/";
 
                     }
                 }
