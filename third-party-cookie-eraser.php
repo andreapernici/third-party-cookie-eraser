@@ -474,7 +474,9 @@ if ( !class_exists( 'AndreaThirdPartyCookieEraser' ) ){
         }
 
         public function printJS(){
-
+		
+		//$this->js_array = '["<script src=\"\/ciao.js\"><\/script>","<iframe src=\"https:\/\/www.facebook.com\/plugins\/like.php?href=http%3A%2F%2Fwww.andreapernici.com%2Fwordpress%2Ffacebook-like-send%2F&amp;layout=standard&amp;show_faces=false&amp;width=450&amp;action=recommend&amp;font=verdana&amp;colorscheme=light&amp;height=35\" scrolling=\"no\" frameborder=\"0\" style=\"border:none; overflow:hidden; width:450px; height:35px;\" allowTransparency=\"true\"><\/iframe>","<iframe src=\"https:\/\/www.facebook.com\/plugins\/likebox.php?href=http%3A%2F%2Fwww.facebook.com%2Fandreapernici.web&amp;width=250&amp;colorscheme=light&amp;connections=10&amp;stream=true&amp;header=true&amp;height=550\" scrolling=\"no\" frameborder=\"0\" style=\"border:none; overflow:hidden; width:250px; height:550px;\" allowTransparency=\"true\"><\/iframe>","<iframe src=\"https:\/\/www.facebook.com\/plugins\/like.php?href=http%3A%2F%2Fwww.andreapernici.com%2Fwordpress%2Ffacebook-like-send%2F&amp;send=true&amp;layout=standard&amp;width=450&amp;show_faces=true&amp;action=like&amp;colorscheme=light&amp;font=lucida+grande&amp;height=80\" scrolling=\"no\" frameborder=\"0\" style=\"border:none; overflow:hidden; width:450px; height:80px;\" allowTransparency=\"true\"><\/iframe>"]';
+		
             $js = '<script>
 
                     var jsArr = ' . $this->js_array . ';
@@ -485,27 +487,39 @@ if ( !class_exists( 'AndreaThirdPartyCookieEraser' ) ){
 
                     var x=document.getElementsByClassName("el");
 
+			var patt = new RegExp("<script.*?\/script>");
+			//var patt = new RegExp("script");
+			//var resun = patt.test("<script src=\"ciao.js\"><\/script>");
+			//console.log(resun);
+
                     var i;
                     for (i = 0; i < x.length; i++) {
 
-                        // console.log(jsArr[i]);
+                        console.log(jsArr[i]);
 
-                        x[i].removeChild(x[i].childNodes[0]);
+			var res = patt.test(jsArr[i]);
+			console.log(res);
+			if (res) {
+				var regex = /<script.*?src="(.*?)"/;
+				var src = regex.exec(jsArr[i])[1];
+				loadJS(src);
+				console.log(src);
+			} else {
+				x[i].removeChild(x[i].childNodes[0]);
 
-                        var str = x[i].innerHTML;
-                        // var res = str.replace(/<!--(.*?)-->/g, "$1");
-                        // Prendo l\'array creato e all\'accettazione ogni valore è messo al suo posto
-                        var res = str.replace(/<cookie>/g, jsArr[i]);
-                        x[i].innerHTML = res;
-
+				var str = x[i].innerHTML;
+				// var res = str.replace(/<!--(.*?)-->/g, "$1");
+				// Prendo l\'array creato e all\'accettazione ogni valore è messo al suo posto
+				var res = str.replace(/<cookie>/g, jsArr[i]);
+				x[i].innerHTML = res;
+			}
+			
                         var cookieName="' . esc_attr( $this->options['cookie_name'] ) . '";var expiryDate=new Date();expiryDate.setFullYear(expiryDate.getFullYear()+1);document.cookie=cookieName+"=' . esc_attr( $this->options['cookie_value'] ) . '; expires="+expiryDate.toGMTString()+"; path=/";
 
                     }
                 }
-            </script>';
-	    // Va solo rimpiazzato file con l'array che contiene gli elementi e filtrare solo quelli che contengono <script.
-	    // In realt� si potrebbe fare direttamente nel ciclo sopra con un IF.
-	    $js_script = '<script type="application/javascript">
+            </script>
+		<script type="application/javascript">
 				function loadJS(file) {
 				    // DOM: Create the script element
 				    var jsElm = document.createElement("script");
@@ -519,7 +533,14 @@ if ( !class_exists( 'AndreaThirdPartyCookieEraser' ) ){
 				</script>';
 
             echo $js;
-
+	    
+		/*$input_string = '<script type="text/javascript" src="http://localhost/assets/javascript/system.js" charset="UTF-8"></script>';
+		$count = preg_match('/src=(["\'])(.*?)\1/', $input_string, $match);
+		if ($count === FALSE) 
+		    echo('not found\n');
+		else 
+		    echo($match[2] . "\n");    
+		*/
         }
 
     }// class
