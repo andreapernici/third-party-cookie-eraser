@@ -494,7 +494,7 @@ if ( !class_exists( 'AndreaThirdPartyCookieEraser' ) ){
 
                         var str = x[i].innerHTML;
                         // var res = str.replace(/<!--(.*?)-->/g, "$1");
-                        // Prendo l\'array creato e all\'accettazione  
+                        // Prendo l\'array creato e all\'accettazione ogni valore è messo al suo posto
                         var res = str.replace(/<cookie>/g, jsArr[i]);
                         x[i].innerHTML = res;
 
