@@ -2,7 +2,7 @@
 Contributors: Andrea Pernici, overclokk
 Donate link: http://www.andreapernici.com/donazioni/
 Tags: cookie law, cookie, third party script, third party cookie
-Requires at least: 2.6
+Requires at least: 4.1
 Tested up to: 4.2.2
 stable tag: 1.1.0
 
