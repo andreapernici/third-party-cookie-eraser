@@ -40,7 +40,7 @@ if ( !defined( 'WPINC' ) )
  */
 
 if ( !defined( 'THIRDPARTYCOOKIEERASER_VERSION' ) )
-	define( 'THIRDPARTYCOOKIEERASER_VERSION', '1.0.2' );
+	define( 'THIRDPARTYCOOKIEERASER_VERSION', '1.1.0' );
 
 if ( !defined( 'THIRDPARTYCOOKIEERASER_PLUGIN' ) )
     define('THIRDPARTYCOOKIEERASER_PLUGIN', true);
@@ -503,6 +503,20 @@ if ( !class_exists( 'AndreaThirdPartyCookieEraser' ) ){
                     }
                 }
             </script>';
+	    // Va solo rimpiazzato file con l'array che contiene gli elementi e filtrare solo quelli che contengono <script.
+	    // In realtà si potrebbe fare direttamente nel ciclo sopra con un IF.
+	    $js_script = '<script type="application/javascript">
+				function loadJS(file) {
+				    // DOM: Create the script element
+				    var jsElm = document.createElement("script");
+				    // set the type attribute
+				    jsElm.type = "application/javascript";
+				    // make the script element load file
+				    jsElm.src = file;
+				    // finally insert the element to the body element in order to load the script
+				    document.body.appendChild(jsElm);
+				}
+				</script>';
 
             echo $js;
 
