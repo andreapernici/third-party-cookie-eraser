@@ -98,6 +98,8 @@ if ( !class_exists( 'AndreaThirdPartyCookieEraser' ) ){
 
         private $valore = '';
 
+        private $js_array = array();
+
 
         /**
          * [__construct description]
@@ -124,37 +126,20 @@ if ( !class_exists( 'AndreaThirdPartyCookieEraser' ) ){
             // 
             $this->options = get_option( 'third-party-cookie-eraser' );
 
-            if ( !isset( $_COOKIE[ $this->options['cookie_name'] ] ) ){
+            if ( !isset( $_COOKIE[ $this->options['cookie_name'] ] ) && !is_admin() ){
 
 
                 /**
                  * Replacement for regex
                  * @var string
                  */
-                $this->valore = '<div class="el"><div style="padding:10px;margin-bottom: 18px;color: #b94a48;background-color: #f2dede;border: 1px solid #eed3d7; text-shadow: 0 1px 0 rgba(255, 255, 255, 0.5);-webkit-border-radius: 4px;-moz-border-radius: 4px;border-radius: 4px;">' . esc_textarea( $this->options['text'] ) . '<button onclick="myFunction()">Try it</button></div><!-- $0 --></div>';
+                // $this->valore = '<div class="el"><div style="padding:10px;margin-bottom: 18px;color: #b94a48;background-color: #f2dede;border: 1px solid #eed3d7; text-shadow: 0 1px 0 rgba(255, 255, 255, 0.5);-webkit-border-radius: 4px;-moz-border-radius: 4px;border-radius: 4px;">' . esc_attr( $this->options['text'] ) . '<button onclick="allowCookie()">Try it</button></div><!-- $0 --></div>';
+                // 
+                $this->valore = '<div class="el"><div style="padding:10px;margin-bottom: 18px;color: #b94a48;background-color: #f2dede;border: 1px solid #eed3d7; text-shadow: 0 1px 0 rgba(255, 255, 255, 0.5);-webkit-border-radius: 4px;-moz-border-radius: 4px;border-radius: 4px;">' . esc_attr( $this->options['text'] ) . '<button onclick="allowCookie()">Try it</button></div><cookie></div>';
 
             	add_filter( 'the_content', array( $this, 'AutoErase' ), 11);
 
-            	add_filter('widget_display_callback', function($instance, $widget, $args){
-            		$fnFixArray = function($v) use (&$fnFixArray){
-            			if(is_array($v) or is_object($v)){
-            				foreach($v as $k1=>&$v1){
-            					$v1 = $fnFixArray($v1);
-            				}
-            				return $v;
-            			}
-
-            			if(!is_string($v) or empty($v)) return $v;
-
-            			// $valore = '<div class="el" id="prova"><div class="alert" style="padding:10px;margin-bottom: 18px;color: #b94a48;background-color: #f2dede;border: 1px solid #eed3d7; text-shadow: 0 1px 0 rgba(255, 255, 255, 0.5);-webkit-border-radius: 4px;-moz-border-radius: 4px;border-radius: 4px;">' . esc_textarea( $this->options['text'] ) . '</div><!-- $0 --></div>';
-
-            			return preg_replace( $this->pattern, $this->valore , $v);
-
-            		};
-
-            		return $fnFixArray($instance);
-
-            	}, 11, 3);
+            	add_filter('widget_display_callback', array( $this, 'WidgetErase' ), 11, 3);
 
                 add_action( 'wp_footer', array( $this, 'printJS' ), 999 );
 
@@ -431,11 +416,17 @@ if ( !class_exists( 'AndreaThirdPartyCookieEraser' ) ){
          */
 		public function AutoErase( $content ) {
 
-			// $valore = '<div class="el" id="prova"><div class="alert" style="padding:10px;margin-bottom: 18px;color: #b94a48;background-color: #f2dede;border: 1px solid #eed3d7; text-shadow: 0 1px 0 rgba(255, 255, 255, 0.5);-webkit-border-radius: 4px;-moz-border-radius: 4px;border-radius: 4px;">' . esc_textarea( $this->options['text'] ) . '</div><!-- $0 --></div>';
-
-            // preg_match_all( $this->pattern, $content, $matches );
+            preg_match_all( $this->pattern, $content, $matches );
 
             // var_dump($matches[0]);
+
+            /**
+             * Memorizzo gli embed trovati e li converto in un array JavaScript
+             * @var [type]
+             */
+            $this->js_array = wp_json_encode($matches[0]);
+
+            // var_dump($this->js_array);
 
             // $i = 0;
             // foreach ( $matches[0] as $value ){
@@ -461,27 +452,53 @@ if ( !class_exists( 'AndreaThirdPartyCookieEraser' ) ){
 			return $content;
 		}
 
-		public function WidgetErase(){
+		public function WidgetErase($instance, $widget, $args){
+
+            $fnFixArray = function($v) use (&$fnFixArray){
+                if(is_array($v) or is_object($v)){
+                    foreach($v as $k1=>&$v1){
+                        $v1 = $fnFixArray($v1);
+                    }
+                    return $v;
+                }
+
+                if(!is_string($v) or empty($v)) return $v;
 
 
-		}
+                return preg_replace( $this->pattern, $this->valore , $v);
+
+            };
+
+            return $fnFixArray($instance);
+
+        }
 
         public function printJS(){
 
             $js = '<script>
-                function myFunction() {
+
+                    var jsArr = ' . $this->js_array . ';
+
+                    // console.log(jsArr[0]);
+
+                function allowCookie() {
+
                     var x=document.getElementsByClassName("el");
 
                     var i;
                     for (i = 0; i < x.length; i++) {
 
+                        // console.log(jsArr[i]);
+
                         x[i].removeChild(x[i].childNodes[0]);
 
                         var str = x[i].innerHTML;
-                        var res = str.replace(/<!--(.*?)-->/g, "$1");
+                        // var res = str.replace(/<!--(.*?)-->/g, "$1");
+                        // Prendo l\'array creato e all\'accettazione  
+                        var res = str.replace(/<cookie>/g, jsArr[i]);
                         x[i].innerHTML = res;
 
-                        cookieName="' . esc_attr( $this->options['cookie_name'] ) . '";var expiryDate=new Date();expiryDate.setFullYear(expiryDate.getFullYear()+1);document.cookie=cookieName+"=' . esc_attr( $this->options['cookie_value'] ) . '; expires="+expiryDate.toGMTString()+"; path=/";
+                        var cookieName="' . esc_attr( $this->options['cookie_name'] ) . '";var expiryDate=new Date();expiryDate.setFullYear(expiryDate.getFullYear()+1);document.cookie=cookieName+"=' . esc_attr( $this->options['cookie_value'] ) . '; expires="+expiryDate.toGMTString()+"; path=/";
 
                     }
                 }
